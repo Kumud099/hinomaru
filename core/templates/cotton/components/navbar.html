@@ -240,67 +240,67 @@
   const mobile_services = document.getElementById("mobile-services");
   const mobile_dropdown = document.getElementById("mobile-dropdown");
 
-  // Desktop services dropdown
-  if (servicesBtn && dropdownMenu) {
-  let showTimeout, hideTimeout;
+if (servicesBtn && dropdownMenu && navbar) {
   let isHoveringServices = false;
-
-  // Show navbar background and dropdown when hovering over the services button
-  servicesBtn.addEventListener("mouseenter", () => {
-    clearTimeout(hideTimeout); // Clear any pending hide timeout
-
-    // Mark that the services button is being hovered
-    isHoveringServices = true;
-
-    // Show navbar background
-    showTimeout = setTimeout(() => {
-      navbar.classList.add("white-bg");
-    }, 10);
-
-    // Show dropdown after some delay
-    setTimeout(() => {
-      dropdownMenu.classList.add("show");
-    }, 230);
-  });
-
-  // Hide navbar background and dropdown when leaving services button (only when not hovering on the dropdown)
-  servicesBtn.addEventListener("mouseleave", () => {
-    isHoveringServices = false; // Mark that the services button is no longer hovered
-
-    // Wait a bit before hiding, but only if the dropdown is not being hovered
-    hideTimeout = setTimeout(() => {
-      if (!isHoveringDropdown) {
-        dropdownMenu.classList.remove("show");
-        navbar.classList.remove("white-bg");
-      }
-    }, 90);
-    
-    
-  });
-
   let isHoveringDropdown = false;
 
-  // Prevent hiding when hovering over the dropdown menu
-  dropdownMenu.addEventListener("mouseenter", () => {
-    isHoveringDropdown = true;
-    clearTimeout(hideTimeout); // Clear any pending hide timeout
+  let showNavbarTimeout, showDropdownTimeout;
+  let hideTimeout;
+
+  function showDropdown() {
+    clearTimeout(hideTimeout);
+    clearTimeout(showNavbarTimeout);
+    clearTimeout(showDropdownTimeout);
+
+    showNavbarTimeout = setTimeout(() => {
+      navbar.classList.add("white-bg");
+    }, 20); // Show navbar a bit earlier
+
+    showDropdownTimeout = setTimeout(() => {
+      dropdownMenu.classList.add("show");
+    }, 200); // Show dropdown after a small delay
+  }
+
+  function hideDropdown() {
+    clearTimeout(showNavbarTimeout);
+    clearTimeout(showDropdownTimeout);
+    clearTimeout(hideTimeout);
+
+    // Use one timeout to hide both
+    hideTimeout = setTimeout(() => {
+      if (!isHoveringServices && !isHoveringDropdown) {
+        navbar.classList.remove("white-bg");
+        dropdownMenu.classList.remove("show");
+      }
+    }, 100); // A unified hide delay
+  }
+
+  servicesBtn.addEventListener("mouseenter", () => {
+    isHoveringServices = true;
+    showDropdown();
   });
 
-  // Hide navbar background and dropdown when leaving dropdown menu (only when not hovering over services button)
-  dropdownMenu.addEventListener("mouseleave", () => {
-    isHoveringDropdown = false; // Mark that the dropdown menu is no longer hovered
+  servicesBtn.addEventListener("mouseleave", () => {
+    isHoveringServices = false;
+    hideDropdown();
+  });
 
-    // Wait a bit before hiding, but only if the services button is not being hovered
-    hideTimeout = setTimeout(() => {
-      if (!isHoveringServices) {
-        dropdownMenu.classList.remove("show");
-        navbar.classList.remove("white-bg");
-      }
-    }, 200);
+  dropdownMenu.addEventListener("mouseenter", () => {
+    isHoveringDropdown = true;
+    showDropdown();
+  });
+
+  dropdownMenu.addEventListener("mouseleave", () => {
+    isHoveringDropdown = false;
+    hideDropdown();
   });
 }
 
-  
+
+
+
+
+
 
   // Mobile menu toggle
   if (hamburgerButton && menu) {
@@ -336,7 +336,6 @@
       }
     });
   }
-
 
 
   // Close menu when clicking outside
@@ -380,4 +379,3 @@
     }
   }
 </script>
-
